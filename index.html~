@@ -45,7 +45,7 @@
 
 <!-- Current Score -->
 <div id="currScore" class="pokeBox">
-<p class="pokeBoxTitle">Score</p>
+<div class="pokeBoxTitle"><span>Score</span></div>
 <p id="currScoreDisp"></p>
 </div>
 
