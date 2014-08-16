@@ -1,5 +1,6 @@
 @font-face {
 	font-family: "PokeFontSolid";
+	font-weight: normal;
 	src: url("PokeFontSolid.ttf");
 }
 
@@ -53,7 +54,7 @@ body {
 	height: 70px;
 	text-align: center;
 	font-size: 16px;
-	font-family: "Comic Sans MS";
+	/*font-family: "Comic Sans MS";*/
 	padding: 15px;
 	margin-left: auto;
 	margin-right: auto;
