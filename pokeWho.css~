@@ -20,7 +20,7 @@
 
 
 .pokeBoxTitle {
-	position: relative;
+	/*position: relative;*/
 	background-color: gray;
 	height: 30px;
 	margin: 0px;
