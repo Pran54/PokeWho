@@ -1,5 +1,6 @@
 @font-face {
 	font-family: "PokeFontSolid";
+	font-weight: normal;
 	src: url("PokeFontSolid.ttf");
 }
 
@@ -23,6 +24,17 @@
 	/*position: relative;*/
 	background-color: gray;
 	height: 30px;
+	margin: 0px;
+	padding: 0px;
+	/*padding-top: 2px;
+	margin-bottom: 5px;*/
+}
+
+.pokeBoxTitleTest {
+	/*position: relative;*/
+	background-color: gray;
+	height: 30px;
+	width: 100%;
 	margin: 0px;
 	padding: 0px;
 	/*padding-top: 2px;
