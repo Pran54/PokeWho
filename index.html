@@ -113,12 +113,32 @@
 <script>
 
 var pkmnName; 		// This is the actual name: Bulbasaur
+var pkmnID;		// The pokemon's ID.
 var pkmnFileName; 	// Bulbasaur001.png
 var myURL;		// This is the URL the image ajax request
 var csvArray;		// This is the csv pokemon database file
 var score = 0;		// The current score
 var myHigh = localStorage.getItem("highScore");	// The high score
 $("#currScoreDisp").html(score);
+
+var troublesomeIndex;
+
+var troublesomeIds = [29, 32, 83, 122, 233, 250, 439, 474, 487, 492, 585, 586, 669];
+
+var troublesomeNames = ["Nidoran", "Nidoran", 
+	"Farfetch'd", "Mr._Mime", "Porygon2", 
+	"Ho-Oh", "Mime_Jr", "Porygon-Z", 
+	"Giratina-Altered", "Shaymin-Land", 
+	"Deerling-Spring", "Sawsbuck-Spring", "Flabébé" ];
+
+
+// Note: you should probably make some of these names variable
+var troublesomeGuessMatch = ["Nidoran", "Nidoran", 
+	"Farfetch'd", "Mr. Mime", "porygon2", 
+	"Ho-Oh", "Mime Jr.", "Porygon-Z", 
+	"Giratina", "Shaymin", 
+	"Deerling", "Sawsbuck", "Flabebe"];
+
 
 
 // GUESSES
@@ -128,6 +148,9 @@ $("#guessesLeft").html(guessesLeft);
 
 // ITERATION
 //var i = 1;
+
+// TROUBLESOME
+//var i = 0;
 
 
 function setupHighScore() {
@@ -157,64 +180,66 @@ function changeHighScore() {
 function jsonSuccess(jsonFile) {
 	var dataStr = jsonFile.query.pages["-1"].imageinfo[0].url;
 	$("#myImg").attr("src", dataStr);
-	console.log("Made a successful JSON call...");
+	//console.log("Made a successful JSON call...");
+
 	// ITERATION
 	//i++;
-	//if (i < 720) { reset(); } else { console.log("I Mean It..."); };
+	//if (i < 720) { reset(); } else { console.log("I Mean It..."); }; 
+
+	// TROUBLESOME
+	//i++;
 };
 
 function jsonCall() {
-	var randomNum = Math.floor((Math.random() * 719) + 1);
+	pkmnID = Math.floor((Math.random() * 719) + 1);
+
 	
+	// TROUBLESOME
+	//if (!(i < troublesomeIds.length)) {
+	//	pkmnID = Math.floor((Math.random() * 719) + 1);
+	//} else {
+	//	pkmnID = troublesomeIds[i];
+	//}
 
 	// ITERATION
-	//var randomNum = i;
+	// var pkmnID = i;
 	
-	console.log(randomNum);
+	//console.log(pkmnID);
 
-	
 
-	if (randomNum === 29) {
-		pkmnName = "Nidoran";
-	} else if (randomNum === 32) {
-		pkmnName = "Nidoran";
-	} else if (randomNum === 83) {
-		pkmnName = "Farfetch'd";
-	} else if (randomNum === 122) {
-		pkmnName = "Mr._Mime";
-	} else if (randomNum === 250) {
-		pkmnName = "Ho-Oh";
-	} else if (randomNum === 439) {
-		pkmnName = "Mime_Jr";
-	} else if (randomNum === 474) {
-		pkmnName = "Porygon-Z";
-	} else if (randomNum === 487) {
-		pkmnName = "Giratina-Altered";
-	} else if (randomNum === 492) {
-		pkmnName = "Shaymin-Land";
-	} else if (randomNum === 585) {
-		pkmnName = "Deerling-Spring";
-	} else if (randomNum === 586) {
-		pkmnName = "Sawsbuck-Spring";
-	} else if (randomNum === 669) {
-		pkmnName = "Flabébé"; 
+	troublesomeIndex = $.inArray(pkmnID, troublesomeIds);
+
+	if (troublesomeIndex > -1) {
+		pkmnName = troublesomeNames[troublesomeIndex];
 	} else {
 		// This code goes through the csv array and gets
 		// the pokemon's name, capitalizing it
-		pkmnName = csvArray[randomNum][1];
+		pkmnName = csvArray[pkmnID][1];
 		pkmnName = pkmnName.substring(0,1).toUpperCase() + pkmnName.substring(1);
 	}
 
 	
+	// This section of code was used to see which pokemon would cause a pkmnName
+	// that would not match what a user would input, or would throw an invalid
+	// character error.
+	//if (!(/^[a-zA-Z]+$/.test(pkmnName))) {
+	//	console.log(pkmnName + "..." + pkmnID);
+	//}
+
+
+
+
+
+
 	// myPkmnID is used to get the dex number of the pokemon
 	// to be used to get the png image from bulbapedia
-	var myPkmnID = csvArray[randomNum][0];	
-	while (myPkmnID.length < 3) {
-		myPkmnID = "0" + myPkmnID;
+	var myPkmnIDStr = csvArray[pkmnID][0];	
+	while (myPkmnIDStr.length < 3) {
+		myPkmnIDStr = "0" + myPkmnIDStr;
 	}
 
 
-	pkmnFileName = myPkmnID + pkmnName + ".png";
+	pkmnFileName = myPkmnIDStr + pkmnName + ".png";
 
 	myURL = "http://bulbapedia.bulbagarden.net/w/api.php?action=query&format=json&titles=File:"+ pkmnFileName +"&prop=imageinfo&iiprop=url";
 	
@@ -226,6 +251,7 @@ function jsonCall() {
 			404: function () { alert("page not found"); }
 		},
 		success: jsonSuccess,
+		async: false,
 	});
 }
 
@@ -255,30 +281,26 @@ $("#skip").click(function() {
 $("#submitGuess").click(function() {
 	console.log("Submit ran...");
 	var myGuess = $("#guess").val();
-	if (/^[a-zA-Z]+$/.test(myGuess)) {
-		console.log("Has only letters...");
-		if (myGuess.toLowerCase() == pkmnName.toLowerCase()) {
 
-			// You need to check for stuff like giratina-altered is
-			// giratina, and Mr. mime without the underscore etc.
-			console.log("Made a correct guess!");
+	if (troublesomeIndex > -1) {
+
+		if (myGuess == troublesomeGuessMatch[troublesomeIndex]) {
+			console.log("Made a correct troublesome guess!");
 			score += 1;
 			$("#currScoreDisp").html(score);
 			changeHighScore();
 			reset();
 
-
 			// GUESSES (ideally no guess reset and you eventually lose)
 			guessesLeft = 3;
 			$("#guessesLeft").html(guessesLeft);
 
-
 		} else {
-			console.log("Incorrect guess!");
-
+			console.log("Incorrect troublesome guess!");
+	
 			// GUESSES
 			if (guessesLeft == 1) {
-				console.log("Out of guesses!");
+				console.log("Out of troublesome guesses!");
 				reset();
 				// Ideally this would end the game
 				guessesLeft = 3;
@@ -288,10 +310,50 @@ $("#submitGuess").click(function() {
 				$("#guessesLeft").html(guessesLeft);
 			}
 		}
-	} else {
-		console.log("Has invalid characters...");
+
+	} else {	
+
+
+		if (/^[a-zA-Z]+$/.test(myGuess)) {
+			console.log("Has only letters...");
+			if (myGuess.toLowerCase() == pkmnName.toLowerCase()) {
+
+				// You need to check for stuff like giratina-altered is
+				// giratina, and Mr. mime without the underscore etc.
+				console.log("Made a correct guess!");
+				score += 1;
+				$("#currScoreDisp").html(score);
+				changeHighScore();
+				reset();
+	
+	
+				// GUESSES (ideally no guess reset and you eventually lose)
+				guessesLeft = 3;
+				$("#guessesLeft").html(guessesLeft);
+
+
+			} else {
+				console.log("Incorrect guess!");
+	
+				// GUESSES
+				if (guessesLeft == 1) {
+					console.log("Out of guesses!");
+					reset();
+					// Ideally this would end the game
+					guessesLeft = 3;
+					$("#guessesLeft").html(guessesLeft);
+				} else {
+					guessesLeft -= 1;
+					$("#guessesLeft").html(guessesLeft);
+				}
+			}
+		} else {
+			console.log("Has invalid characters...");
+		}
 	}
 });
+
+
 
 $(document).ready(function() {
 	csvCall();
