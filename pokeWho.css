@@ -163,15 +163,16 @@ body {
 	width: 240px;
 	margin-left: auto;
 	margin-right: auto;
+	margin-top: 5px;
 }
 
 #submitGuess {
-	margin-top: 5px;
+	margin-top: 10px;
 	width: 100px;
 }
 
 #skip {
-	margin-top: 5px;
+	margin-top: 10px;
 	width: 100px;
 }
 

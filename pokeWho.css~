@@ -167,13 +167,11 @@ body {
 
 #submitGuess {
 	margin-top: 5px;
-	float: bottom;
 	width: 100px;
 }
 
 #skip {
 	margin-top: 5px;
-	float: bottom;
 	width: 100px;
 }
 
