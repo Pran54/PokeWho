@@ -159,6 +159,21 @@ body {
 }
 
 
+#guess {
+	width: 240px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#submitGuess {
+	width: 100px;
+}
+
+#skip {
+	width: 100px;
+}
+
+
 /* The statusBox: 350x80 */
 #statusBox {
 	width: 340px;

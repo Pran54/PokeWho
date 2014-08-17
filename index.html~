@@ -86,7 +86,6 @@
 <div id="guessBox" class="pokeBox">
 <p class="pokeBoxTitle">Who is it?<p>
 <input id="guess" type="text">
-<br>
 <button id="submitGuess">Take a Guess</button>
 <button id="skip">Skip</button>
 </div>
