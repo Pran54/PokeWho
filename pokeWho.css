@@ -166,13 +166,13 @@ body {
 }
 
 #submitGuess {
-	padding-bottom: 5px;
+	margin-top: 5px;
 	float: bottom;
 	width: 100px;
 }
 
 #skip {
-	padding-bottom: 5px;
+	margin-top: 5px;
 	float: bottom;
 	width: 100px;
 }
