@@ -86,10 +86,8 @@
 <div id="guessBox" class="pokeBox">
 <p class="pokeBoxTitle">Who is it?<p>
 <input id="guess" type="text">
-<div id="buttons">
 <button id="submitGuess">Take a Guess</button>
 <button id="skip">Skip</button>
-</div>
 </div>
 <!--- -END OF GUESS INPUT BOX ------>
 
@@ -117,6 +115,7 @@
 var pkmnName; 		// This is the actual name: Bulbasaur
 var pkmnFileName; 	// Bulbasaur001.png
 var myURL;		// This is the URL the image ajax request
+var csvArray;		// This is the csv pokemon database file
 var score = 0;
 $("#currScoreDisp").html(score);
 
@@ -130,16 +129,22 @@ $("#guessesLeft").html(guessesLeft);
 //var i = 1;
 
 
+
+
+
+
+
+
 function jsonSuccess(jsonFile) {
 	var dataStr = jsonFile.query.pages["-1"].imageinfo[0].url;
 	$("#myImg").attr("src", dataStr);
-	
+	console.log("Made a successful JSON call...");
 	// ITERATION
 	//i++;
 	//if (i < 720) { reset(); } else { console.log("I Mean It..."); };
 };
 
-function jsonCall(csvFile) {
+function jsonCall() {
 	var randomNum = Math.floor((Math.random() * 719) + 1);
 	
 
@@ -148,7 +153,7 @@ function jsonCall(csvFile) {
 	
 	console.log(randomNum);
 
-	var csvArray = $.csv.toArrays(csvFile);
+	
 
 	if (randomNum === 29) {
 		pkmnName = "Nidoran";
@@ -209,14 +214,19 @@ function csvCall() {
 	$.ajax({
 		url: "pokemon_species.csv",
 		dataType: "text",
-		success: jsonCall,
+		success: csvSuccess,
 	});
+}
+
+function csvSuccess(csvFile) {
+	csvArray = $.csv.toArrays(csvFile);
+	console.log("Made a successful CSV call...");
 }
 
 
 
 function reset() {
-	csvCall();
+	jsonCall();
 }
 
 $("#skip").click(function() {
@@ -262,6 +272,10 @@ $("#submitGuess").click(function() {
 		console.log("Has invalid characters...");
 	}
 });
+
+$(document).ready(function() {
+	csvCall();
+	});
 		
 </script>
 

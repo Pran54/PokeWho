@@ -116,7 +116,8 @@ var pkmnName; 		// This is the actual name: Bulbasaur
 var pkmnFileName; 	// Bulbasaur001.png
 var myURL;		// This is the URL the image ajax request
 var csvArray;		// This is the csv pokemon database file
-var score = 0;
+var score = 0;		// The current score
+var myHigh = localStorage.getItem("highScore");	// The high score
 $("#currScoreDisp").html(score);
 
 
@@ -127,6 +128,30 @@ $("#guessesLeft").html(guessesLeft);
 
 // ITERATION
 //var i = 1;
+
+
+function setupHighScore() {
+
+	if (myHigh === null) {
+		localStorage.setItem("highScore", "0");
+		myHigh = localStorage.getItem("highScore");
+	}
+
+	$("#highScoreDisp").html(myHigh);
+}
+
+function changeHighScore() {
+
+	if (score > myHigh) {
+		localStorage.setItem("highScore", score.toString());
+		myHigh = score.toString();
+	}
+
+	$("#highScoreDisp").html(myHigh);
+}
+
+
+
 
 
 function jsonSuccess(jsonFile) {
@@ -239,6 +264,7 @@ $("#submitGuess").click(function() {
 			console.log("Made a correct guess!");
 			score += 1;
 			$("#currScoreDisp").html(score);
+			changeHighScore();
 			reset();
 
 
@@ -269,6 +295,7 @@ $("#submitGuess").click(function() {
 
 $(document).ready(function() {
 	csvCall();
+	setupHighScore();
 	});
 		
 </script>
