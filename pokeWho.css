@@ -165,16 +165,15 @@ body {
 	margin-right: auto;
 }
 
-#buttons {
+#submitGuess {
 	padding-bottom: 5px;
 	float: bottom;
-}
-
-#submitGuess {
 	width: 100px;
 }
 
 #skip {
+	padding-bottom: 5px;
+	float: bottom;
 	width: 100px;
 }
 
