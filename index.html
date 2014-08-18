@@ -66,15 +66,15 @@
 <p class="pokeBoxTitle">Choose Your Generations:</p>
 
 <div id="gen1to3">
-<input type="checkbox">I<br>
-<input type="checkbox">II<br>
-<input type="checkbox">III<br>
+<input type="checkbox" id="gen1">I<br>
+<input type="checkbox" id="gen2">II<br>
+<input type="checkbox" id="gen3">III<br>
 </div>
 
 <div id="gen4to6">
-<input type="checkbox">IV<br>
-<input type="checkbox">V<br>
-<input type="checkbox">VI<br>
+<input type="checkbox" id="gen4">IV<br>
+<input type="checkbox" id="gen5">V<br>
+<input type="checkbox" id="gen6">VI<br>
 </div>
 
 </div>
@@ -117,8 +117,10 @@ var pkmnID;		// The pokemon's ID.
 var pkmnFileName; 	// Bulbasaur001.png
 var myURL;		// This is the URL the image ajax request
 var csvArray;		// This is the csv pokemon database file
+var generationArray = [1, 2, 3, 4, 5, 6]; 	//This stores which generations have been selected
 var score = 0;		// The current score
 var myHigh = localStorage.getItem("highScore");	// The high score
+
 $("#currScoreDisp").html(score);
 
 var troublesomeIndex;
@@ -174,7 +176,33 @@ function changeHighScore() {
 }
 
 
+function randomVal(minRange, maxRange) {
+	return (Math.floor((Math.random() * (maxRange - minRange + 1)) + minRange));
+}
 
+function getRandomId() {
+
+	if (generationArray.length != 0) {
+
+	var whichGen = generationArray[(randomVal(0, (generationArray.length - 1)))];
+	console.log(whichGen);
+	if (whichGen === 1) {
+		return randomVal(1, 151);
+	} else if (whichGen === 2) {
+		return randomVal(152, 251);
+	} else if (whichGen === 3) {
+		return randomVal(252, 386);
+	} else if (whichGen === 4) {
+		return randomVal(387, 493);
+	} else if (whichGen === 5) {
+		return randomVal(494, 649);
+	} else if (whichGen === 6) {
+		return randomVal(650, 719);
+	}
+	} else {
+		return pkmnID;
+	}
+}
 
 
 function jsonSuccess(jsonFile) {
@@ -191,9 +219,10 @@ function jsonSuccess(jsonFile) {
 };
 
 function jsonCall() {
-	pkmnID = Math.floor((Math.random() * 719) + 1);
+	//pkmnID = Math.floor((Math.random() * 719) + 1);
 
-	
+	pkmnID = getRandomId();	
+
 	// TROUBLESOME
 	//if (!(i < troublesomeIds.length)) {
 	//	pkmnID = Math.floor((Math.random() * 719) + 1);
@@ -354,10 +383,48 @@ $("#submitGuess").click(function() {
 });
 
 
+function changeGenArray(genNum) {
+	if (!($("#gen" + genNum).prop("checked"))) {
+		generationArray = $.grep(generationArray, function(value) {
+						return (value != genNum);
+					});
+		console.log("You removed " + genNum + " from it...");
+	} else {
+		generationArray.push(genNum);
+		console.log("You pushed " + genNum + " to it...");
+	}
+}	 
+
+function checkCheckboxes() {
+	for (var j = 1; j < 7; j++) {	
+		console.log("Got to " + j);
+		$("#gen" + j).prop("checked", true);
+	}
+
+	$("#gen1").on("click", function() {
+		changeGenArray(1);
+	});
+	$("#gen2").on("click", function() {
+		changeGenArray(2);
+	});
+	$("#gen3").on("click", function() {
+		changeGenArray(3);
+	});
+	$("#gen4").on("click", function() {
+		changeGenArray(4);
+	});
+	$("#gen5").on("click", function() {
+		changeGenArray(5);
+	});
+	$("#gen6").on("click", function() {
+		changeGenArray(6);
+	});
+}
 
 $(document).ready(function() {
 	csvCall();
 	setupHighScore();
+	checkCheckboxes();
 	});
 		
 </script>
