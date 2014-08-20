@@ -107,14 +107,14 @@ body {
 #amIRight {
 	height: 80px;
 	width: 580px;
-	font-size: 40px;
+	font-size: 30px;
 }
 
 #whoIsIt {
 	height: 80px;
 	width: 580px;
 	font-size: 20px;
-	margin-bottom: 5px;
+	margin-bottom: 10px;
 }
 
 
