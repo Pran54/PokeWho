@@ -19,9 +19,9 @@
 <div id="mainContent">
 
 <!-- Title -->
-<p id="titleText"> Who's That Pokemon? </p>
+<p id="titleText"> Who's That Pokémon? </p>
 
-<p id="introText"> This game is based on the guessing game from the show, except I chose to show the actual Pokemon instead of just the silhouette! Choose which generations you want to play from at the right (the default is all generations). Images are obtained from <a href="http://archives.bulbagarden.net/w/index.php?title=Category:Ken_Sugimori_Pok%C3%A9mon_artwork&fileuntil=*092%0A092Gastly+RG.png#mw-category-media" style="color: yellow">Bulbapedia</a> and were drawn by Ken Sugimori. I use a database obtained from <a href="https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/pokemon_species.csv" style="color: yellow">Veekun's Github</a> (thanks!).</p>
+<p id="introText"> This game is based on the guessing game from the show, except I chose to show the actual Pokémon instead of just the silhouette! Choose which generations you want to play from at the right (the default is all generations). Pokémon is © Nintentdo. Images are obtained from <a href="http://archives.bulbagarden.net/w/index.php?title=Category:Ken_Sugimori_Pok%C3%A9mon_artwork&fileuntil=*092%0A092Gastly+RG.png#mw-category-media" style="color: yellow">Bulbapedia</a> and were drawn by Ken Sugimori. I use a database obtained from <a href="https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/pokemon_species.csv" style="color: yellow">Veekun's Github</a> (thanks!).</p>
 
 <!---------- PAGE LEFT --------->
 <div id="leftSide">
@@ -137,6 +137,7 @@ var csvArray;					// This is the csv pokemon database file
 var guessesLeft = 3;				// Guesses
 var score = 0;					// The current score
 var generationArray = [1, 2, 3, 4, 5, 6];	// This stores which generations have been selected
+var numOfGens = 6;				// The number of generations selected.
 var myHigh = localStorage.getItem("highScore");	// The high score
 
 
@@ -294,9 +295,11 @@ function changeGenArray(genNum) {
 						return (value != genNum);
 					});
 		console.log("You removed " + genNum + " from it...");
+		numOfGens -= 1;
 	} else {
 		generationArray.push(genNum);
 		console.log("You pushed " + genNum + " to it...");
+		numOfGens += 1;
 	}
 }	 
 
@@ -326,6 +329,7 @@ function checkCheckboxes() {
 	});
 }
 
+
 function buttonSwitch(aBoolean) {
 	for (var j = 1; j < 7; j++) {
 		// console.log("Disabled " + j);
@@ -336,6 +340,18 @@ function buttonSwitch(aBoolean) {
 	$("#newGame").prop("disabled", aBoolean);
 } 
 
+
+/*
+function atLeastOneGen() {
+	var atLeastOneGen = false;
+	for (var k = 1; k < 7; k++) {
+		var genChecked = ("#gen" + k).prop("disabled");
+		atLeastOneGen = atLeastOneGen || (!genChecked);
+	}
+
+	return atLeastOneGen;
+} */
+	
 
 /********************************************************/
 /********************************************************/
@@ -366,16 +382,16 @@ function showCorrectOrNot(amIRight, whoIsIt, resetAlso) {
 	});
 };
 
-function correctGuessSequence(aGuess, currStatus) {
-	aGuess = aGuess.toLowerCase();
-	aGuess = aGuess.substring(0,1).toUpperCase() + aGuess.substring(1);
+function correctGuessSequence(answer, currStatus) {
+	answer = answer.toLowerCase();
+	answer = answer.substring(0,1).toUpperCase() + answer.substring(1);
 	
 	if (currStatus === "Correct") {
 		$("#guess").val("");
 		score += 1;
 		$("#currScoreDisp").html(score);
 		changeHighScore();
-		showCorrectOrNot("Correct!", "It's " + aGuess + " !", true);
+		showCorrectOrNot("Correct!", "It's " + answer + " !", true);
 		guessesLeft = 3;
 	} else if (currStatus === "Incorrect") {
 		showCorrectOrNot("Incorrect", "Try again!", false);
@@ -384,7 +400,7 @@ function correctGuessSequence(aGuess, currStatus) {
 	} else if (currStatus === "GameOver") {
 		$("#guess").val("");
 		guessesLeft = 3;
-		showCorrectOrNot("Game Over", "It was " + aGuess + ". Play again!", true);
+		showCorrectOrNot("Game Over", "It was " + answer + ". Play again!", true);
 	}
 
 	$("#guessesLeft").html(guessesLeft);
@@ -395,32 +411,39 @@ $("#currScoreDisp").html(score);
 $("#guessesLeft").html(guessesLeft);
 
 $("#submitGuess").click(function() {
-	buttonSwitch(true);
-	console.log("Submit ran...");
-	var myGuess = $("#guess").val();
-	var guessCheck;
 
-	if ((troublesomeIndex > -1) || (/^[a-zA-Z]+$/.test(myGuess))) {
+	if (numOfGens > 0) {
+	
+		buttonSwitch(true);
+		console.log("Submit ran...");
+		var myGuess = $("#guess").val();
+		var guessCheck;
 
-		if (troublesomeIndex > -1) {
-			guessCheck = troublesomeGuessMatch[troublesomeIndex];
-		} else {
-			guessCheck = pkmnName;
-		}
+		if ((troublesomeIndex > -1) || (/^[a-zA-Z]+$/.test(myGuess))) {
 
-		if (myGuess.toLowerCase() === guessCheck.toLowerCase()) {
-			correctGuessSequence(myGuess, "Correct");
-		} else {
-			if (guessesLeft == 1) {
-				correctGuessSequence(myGuess, "GameOver");
+			if (troublesomeIndex > -1) {
+				guessCheck = troublesomeGuessMatch[troublesomeIndex];
 			} else {
-				correctGuessSequence(myGuess, "Incorrect");
+				guessCheck = pkmnName;
 			}
-		}
+	
+			if (myGuess.toLowerCase() === guessCheck.toLowerCase()) {
+				correctGuessSequence(guessCheck, "Correct");
+			} else {
+				if (guessesLeft == 1) {
+					correctGuessSequence(guessCheck, "GameOver");
+				} else {
+					correctGuessSequence(guessCheck, "Incorrect");
+				}
+			}
  
-	} else {	
-		console.log("Has invalid characters...");
-		buttonSwitch(false);
+		} else {	
+			console.log("Has invalid characters...");
+			buttonSwitch(false);
+		}	
+
+	} else { 
+		console.log("Need to choose at least one generation..."); 
 	}
 });
 
@@ -430,6 +453,7 @@ $(document).ready(function() {
 	checkCheckboxes();
 	buttonSwitch(false);
 	$("#guess").val("");
+	$("#submitGuess").prop("disabled", true);
 });
 
 $("#newGame").click(function() {
