@@ -15,7 +15,7 @@
 	border-width: 5px;
 	border-style: solid;
 	border-radius: 20px;
-	background-color: #4169E1; 
+	background-color: #4169E1 !important; 
 	overflow: hidden;
 }
 
@@ -91,6 +91,29 @@ body {
 #myImg {
 	width: 580px;
 	height: 580px;
+}
+
+#rightOrNot {
+	position: relative;
+	background-color: gray;
+	border-top: 5px solid #000080;
+	border-bottom: 5px solid #000080;
+	width: 580px;
+	height: 90px;
+	z-index: 9999;
+	top: -350px;
+}
+
+#amIRight {
+	height: 80px;
+	width: 580px;
+	font-size: 50px;
+}
+
+#whoIsIt {
+	height: 80px;
+	width: 580px;
+	font-size: 30px;
 }
 
 
