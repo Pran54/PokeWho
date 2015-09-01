@@ -19,16 +19,26 @@
 <div id="mainContent">
 
 <!-- Title -->
-<p id="titleText"> Who's That Pokemon? </p>
+<p id="titleText"> Who's That Pokémon? </p>
 
-<p id="introText"> This game is based on the guessing game from the show, except I chose to show the actual Pokemon instead of just the silhouette! Choose which generations you want to play from at the right (the default is all generations). Images are obtained from <a href="http://archives.bulbagarden.net/w/index.php?title=Category:Ken_Sugimori_Pok%C3%A9mon_artwork&fileuntil=*092%0A092Gastly+RG.png#mw-category-media" style="color: yellow">Bulbapedia</a> and were drawn by Ken Sugimori. I use a database obtained from <a href="https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/pokemon_species.csv" style="color: yellow">Veekun's Github</a> (thanks!).</p>
+<p id="introText"> This game is based on the guessing game from the show, except I chose to show the actual Pokémon instead of just the silhouette! Choose which generations you want to play from at the right (the default is all generations). Pokémon is © Nintentdo. Images are obtained from <a href="http://archives.bulbagarden.net/w/index.php?title=Category:Ken_Sugimori_Pok%C3%A9mon_artwork&fileuntil=*092%0A092Gastly+RG.png#mw-category-media" style="color: yellow">Bulbapedia</a> and were drawn by Ken Sugimori. I use a database obtained from <a href="https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/pokemon_species.csv" style="color: yellow">Veekun's Github</a> (thanks!).</p>
 
 <!---------- PAGE LEFT --------->
 <div id="leftSide">
 
 <!-- Main Image Box -->
 <div id="imageBox" class="pokeBox">
-<img id="myImg" src="http://t2.gstatic.com/images?q=tbn:ANd9GcReehil_3oUTa3YqXmfDcOYmjvIT_DYpw3oUmSnmj3gqAGx__eh"/>
+<img id="myImg" src="http://cdn.bulbagarden.net/upload/0/0d/025Pikachu.png"/>
+<!-- src="http://t2.gstatic.com/images?q=tbn:ANd9GcReehil_3oUTa3YqXmfDcOYmjvIT_DYpw3oUmSnmj3gqAGx__eh"/> -->
+
+<p id="rightOrNot">
+<span id="amIRight">Play!</span>
+<br>
+<span id="whoIsIt">Press New Game</span>
+<!--<p id="amIRight">Correct!</p>
+<p id="whoIsIt">It's a Pokemon!</p>-->
+</p>
+
 </div>
 
 </div>
@@ -66,15 +76,15 @@
 <p class="pokeBoxTitle">Choose Your Generations:</p>
 
 <div id="gen1to3">
-<input type="checkbox">I<br>
-<input type="checkbox">II<br>
-<input type="checkbox">III<br>
+<input type="checkbox" id="gen1">I<br>
+<input type="checkbox" id="gen2">II<br>
+<input type="checkbox" id="gen3">III<br>
 </div>
 
 <div id="gen4to6">
-<input type="checkbox">IV<br>
-<input type="checkbox">V<br>
-<input type="checkbox">VI<br>
+<input type="checkbox" id="gen4">IV<br>
+<input type="checkbox" id="gen5">V<br>
+<input type="checkbox" id="gen6">VI<br>
 </div>
 
 </div>
@@ -87,7 +97,7 @@
 <p class="pokeBoxTitle">Who is it?<p>
 <input id="guess" type="text">
 <button id="submitGuess">Take a Guess</button>
-<button id="skip">Skip</button>
+<button id="newGame">New Game</button>
 </div>
 <!--- -END OF GUESS INPUT BOX ------>
 
@@ -112,83 +122,144 @@
 
 <script>
 
-var pkmnName; 		// This is the actual name: Bulbasaur
-var pkmnFileName; 	// Bulbasaur001.png
-var myURL;		// This is the URL the image ajax request
-var score = 0;
-$("#currScoreDisp").html(score);
+
+/********************************************************/
+/********************************************************/
+/**********************   VARIABLES   *******************/
+/********************************************************/
+/********************************************************/
+
+var pkmnName;					// This is the actual name: Bulbasaur
+var pkmnID;					// The pokemon's ID.
+var pkmnFileName;				// Bulbasaur001.png
+var myURL;					// This is the URL the image ajax request
+var csvArray;					// This is the csv pokemon database file
+var guessesLeft = 3;				// Guesses
+var score = 0;					// The current score
+var generationArray = [1, 2, 3, 4, 5, 6];	// This stores which generations have been selected
+var numOfGens = 6;				// The number of generations selected.
+var myHigh = localStorage.getItem("highScore");	// The high score
 
 
-// GUESSES
-var guessesLeft = 3;
-$("#guessesLeft").html(guessesLeft);
 
 
-// ITERATION
-//var i = 1;
+/********************************************************/
+/********************************************************/
+/***************   TROUBLESOME PKMN   *******************/
+/********************************************************/
+/********************************************************/
+
+var troublesomeIndex;
+
+var troublesomeIds = [29, 32, 83, 122, 233, 250, 439, 474, 487, 492, 585, 586, 669];
+
+var troublesomeNames = ["Nidoran", "Nidoran", 
+	"Farfetch'd", "Mr._Mime", "Porygon2", 
+	"Ho-Oh", "Mime_Jr", "Porygon-Z", 
+	"Giratina-Altered", "Shaymin-Land", 
+	"Deerling-Spring", "Sawsbuck-Spring", "Flabébé" ];
+
+
+// Note: you should probably make some of these names variable
+var troublesomeGuessMatch = ["Nidoran", "Nidoran", 
+	"Farfetch'd", "Mr. Mime", "porygon2", 
+	"Ho-Oh", "Mime Jr.", "Porygon-Z", 
+	"Giratina", "Shaymin", 
+	"Deerling", "Sawsbuck", "Flabebe"];
+
+
+
+
+/********************************************************/
+/********************************************************/
+/******************   FUNCTIONS   ***********************/
+/********************************************************/
+/********************************************************/
+
+
+function setupHighScore() {
+
+	if (myHigh === null) {
+		localStorage.setItem("highScore", "0");
+		myHigh = localStorage.getItem("highScore");
+	}
+
+	$("#highScoreDisp").html(myHigh);
+}
+
+function changeHighScore() {
+
+	if (score > myHigh) {
+		localStorage.setItem("highScore", score.toString());
+		myHigh = score.toString();
+	}
+
+	$("#highScoreDisp").html(myHigh);
+}
+
+
+function randomVal(minRange, maxRange) {
+	return (Math.floor((Math.random() * (maxRange - minRange + 1)) + minRange));
+}
+
+function getRandomId() {
+
+	if (generationArray.length != 0) {
+
+	var whichGen = generationArray[(randomVal(0, (generationArray.length - 1)))];
+	console.log(whichGen);
+	if (whichGen === 1) {
+		return randomVal(1, 151);
+	} else if (whichGen === 2) {
+		return randomVal(152, 251);
+	} else if (whichGen === 3) {
+		return randomVal(252, 386);
+	} else if (whichGen === 4) {
+		return randomVal(387, 493);
+	} else if (whichGen === 5) {
+		return randomVal(494, 649);
+	} else if (whichGen === 6) {
+		return randomVal(650, 719);
+	}
+	} else {
+		return pkmnID;
+	}
+}
 
 
 function jsonSuccess(jsonFile) {
 	var dataStr = jsonFile.query.pages["-1"].imageinfo[0].url;
 	$("#myImg").attr("src", dataStr);
-	
-	// ITERATION
-	//i++;
-	//if (i < 720) { reset(); } else { console.log("I Mean It..."); };
+	$("#myImg").on("load", function() {
+				buttonSwitch(false);
+			});
 };
 
-function jsonCall(csvFile) {
-	var randomNum = Math.floor((Math.random() * 719) + 1);
-	
+function jsonCall() {
 
-	// ITERATION
-	//var randomNum = i;
-	
-	console.log(randomNum);
+	pkmnID = getRandomId();	
 
-	var csvArray = $.csv.toArrays(csvFile);
+	troublesomeIndex = $.inArray(pkmnID, troublesomeIds);
 
-	if (randomNum === 29) {
-		pkmnName = "Nidoran";
-	} else if (randomNum === 32) {
-		pkmnName = "Nidoran";
-	} else if (randomNum === 83) {
-		pkmnName = "Farfetch'd";
-	} else if (randomNum === 122) {
-		pkmnName = "Mr._Mime";
-	} else if (randomNum === 250) {
-		pkmnName = "Ho-Oh";
-	} else if (randomNum === 439) {
-		pkmnName = "Mime_Jr";
-	} else if (randomNum === 474) {
-		pkmnName = "Porygon-Z";
-	} else if (randomNum === 487) {
-		pkmnName = "Giratina-Altered";
-	} else if (randomNum === 492) {
-		pkmnName = "Shaymin-Land";
-	} else if (randomNum === 585) {
-		pkmnName = "Deerling-Spring";
-	} else if (randomNum === 586) {
-		pkmnName = "Sawsbuck-Spring";
-	} else if (randomNum === 669) {
-		pkmnName = "Flabébé"; 
+	if (troublesomeIndex > -1) {
+		pkmnName = troublesomeNames[troublesomeIndex];
 	} else {
 		// This code goes through the csv array and gets
 		// the pokemon's name, capitalizing it
-		pkmnName = csvArray[randomNum][1];
+		pkmnName = csvArray[pkmnID][1];
 		pkmnName = pkmnName.substring(0,1).toUpperCase() + pkmnName.substring(1);
 	}
 
-	
+
 	// myPkmnID is used to get the dex number of the pokemon
 	// to be used to get the png image from bulbapedia
-	var myPkmnID = csvArray[randomNum][0];	
-	while (myPkmnID.length < 3) {
-		myPkmnID = "0" + myPkmnID;
+	var myPkmnIDStr = csvArray[pkmnID][0];	
+	while (myPkmnIDStr.length < 3) {
+		myPkmnIDStr = "0" + myPkmnIDStr;
 	}
 
 
-	pkmnFileName = myPkmnID + pkmnName + ".png";
+	pkmnFileName = myPkmnIDStr + pkmnName + ".png";
 
 	myURL = "http://bulbapedia.bulbagarden.net/w/api.php?action=query&format=json&titles=File:"+ pkmnFileName +"&prop=imageinfo&iiprop=url";
 	
@@ -207,59 +278,197 @@ function csvCall() {
 	$.ajax({
 		url: "pokemon_species.csv",
 		dataType: "text",
-		success: jsonCall,
+		success: csvSuccess,
+	});
+}
+
+function csvSuccess(csvFile) {
+	csvArray = $.csv.toArrays(csvFile);
+	// console.log("Made a successful CSV call...");
+}
+
+
+
+function changeGenArray(genNum) {
+	if (!($("#gen" + genNum).prop("checked"))) {
+		generationArray = $.grep(generationArray, function(value) {
+						return (value != genNum);
+					});
+		console.log("You removed " + genNum + " from it...");
+		numOfGens -= 1;
+	} else {
+		generationArray.push(genNum);
+		console.log("You pushed " + genNum + " to it...");
+		numOfGens += 1;
+	}
+}	 
+
+function checkCheckboxes() {
+	for (var j = 1; j < 7; j++) {	
+		//console.log("Got to " + j);
+		$("#gen" + j).prop("checked", true);
+	}
+
+	$("#gen1").on("click", function() {
+		changeGenArray(1);
+	});
+	$("#gen2").on("click", function() {
+		changeGenArray(2);
+	});
+	$("#gen3").on("click", function() {
+		changeGenArray(3);
+	});
+	$("#gen4").on("click", function() {
+		changeGenArray(4);
+	});
+	$("#gen5").on("click", function() {
+		changeGenArray(5);
+	});
+	$("#gen6").on("click", function() {
+		changeGenArray(6);
 	});
 }
 
 
+function buttonSwitch(aBoolean) {
+	for (var j = 1; j < 7; j++) {
+		// console.log("Disabled " + j);
+		$("#gen" + j).prop("disabled", aBoolean); 
+	}
 
-function reset() {
-	csvCall();
+	$("#submitGuess").prop("disabled", aBoolean);
+	$("#newGame").prop("disabled", aBoolean);
+} 
+
+
+/*
+function atLeastOneGen() {
+	var atLeastOneGen = false;
+	for (var k = 1; k < 7; k++) {
+		var genChecked = ("#gen" + k).prop("disabled");
+		atLeastOneGen = atLeastOneGen || (!genChecked);
+	}
+
+	return atLeastOneGen;
+} */
+	
+
+/********************************************************/
+/********************************************************/
+/******   GAME SEQUENCE AND BUTTON CLICK OPS   **********/
+/********************************************************/
+/********************************************************/
+
+function showCorrectOrNot(amIRight, whoIsIt, resetAlso) {
+	$("#myImg").fadeTo(200, 0.50, function() {
+		$("#amIRight").html(amIRight);
+		$("#whoIsIt").html(whoIsIt);
+		$("#rightOrNot").show(200); //, function() { console.log("Showed div..."); });
+
+		setTimeout( function() {
+
+			$("#rightOrNot").hide(300); //, function() {console.log("Hid div..."); });
+
+			$("#myImg").fadeTo(200, 1, function() {
+				console.log("Animation...");
+			});
+
+		}, 3000);
+
+		setTimeout( function() { 
+			if (resetAlso) { jsonCall(); }
+			if (amIRight === "Game Over") { score = 0; $("#currScoreDisp").html(score); }
+		}, 4000 );
+	});
+};
+
+function correctGuessSequence(answer, currStatus) {
+	answer = answer.toLowerCase();
+	answer = answer.substring(0,1).toUpperCase() + answer.substring(1);
+	
+	if (currStatus === "Correct") {
+		$("#guess").val("");
+		score += 1;
+		$("#currScoreDisp").html(score);
+		changeHighScore();
+		showCorrectOrNot("Correct!", "It's " + answer + " !", true);
+		guessesLeft = 3;
+	} else if (currStatus === "Incorrect") {
+		showCorrectOrNot("Incorrect", "Try again!", false);
+		buttonSwitch(false);
+		guessesLeft -= 1;
+	} else if (currStatus === "GameOver") {
+		$("#guess").val("");
+		guessesLeft = 3;
+		showCorrectOrNot("Game Over", "It was " + answer + ". Play again!", true);
+	}
+
+	$("#guessesLeft").html(guessesLeft);
 }
 
-$("#skip").click(function() {
-	reset();
-});
+
+$("#currScoreDisp").html(score);
+$("#guessesLeft").html(guessesLeft);
 
 $("#submitGuess").click(function() {
-	console.log("Submit ran...");
-	var myGuess = $("#guess").val();
-	if (/^[a-zA-Z]+$/.test(myGuess)) {
-		console.log("Has only letters...");
-		if (myGuess.toLowerCase() == pkmnName.toLowerCase()) {
 
-			// You need to check for stuff like giratina-altered is
-			// giratina, and Mr. mime without the underscore etc.
-			console.log("Made a correct guess!");
-			score += 1;
-			$("#currScoreDisp").html(score);
-			reset();
+	if (numOfGens > 0) {
+	
+		buttonSwitch(true);
+		console.log("Submit ran...");
+		var myGuess = $("#guess").val();
+		var guessCheck;
 
+		if ((troublesomeIndex > -1) || (/^[a-zA-Z]+$/.test(myGuess))) {
 
-			// GUESSES (ideally no guess reset and you eventually lose)
-			guessesLeft = 3;
-			$("#guessesLeft").html(guessesLeft);
-
-
-		} else {
-			console.log("Incorrect guess!");
-
-			// GUESSES
-			if (guessesLeft == 1) {
-				console.log("Out of guesses!");
-				reset();
-				// Ideally this would end the game
-				guessesLeft = 3;
-				$("#guessesLeft").html(guessesLeft);
+			if (troublesomeIndex > -1) {
+				guessCheck = troublesomeGuessMatch[troublesomeIndex];
 			} else {
-				guessesLeft -= 1;
-				$("#guessesLeft").html(guessesLeft);
+				guessCheck = pkmnName;
 			}
-		}
-	} else {
-		console.log("Has invalid characters...");
+	
+			if (myGuess.toLowerCase() === guessCheck.toLowerCase()) {
+				correctGuessSequence(guessCheck, "Correct");
+			} else {
+				if (guessesLeft == 1) {
+					correctGuessSequence(guessCheck, "GameOver");
+				} else {
+					correctGuessSequence(guessCheck, "Incorrect");
+				}
+			}
+ 
+		} else {	
+			console.log("Has invalid characters...");
+			buttonSwitch(false);
+		}	
+
+	} else { 
+		console.log("Need to choose at least one generation..."); 
 	}
 });
+
+$(document).ready(function() {
+	csvCall();
+	setupHighScore();
+	checkCheckboxes();
+	buttonSwitch(false);
+	$("#guess").val("");
+	$("#submitGuess").prop("disabled", true);
+});
+
+$("#newGame").click(function() {
+	$("#rightOrNot").hide(200);
+	buttonSwitch(true);
+	score = 0; 
+	$("#currScoreDisp").html(score); 
+	$("#guess").val("");
+	jsonCall();
+});
+
+
+
+
+
 		
 </script>
 
