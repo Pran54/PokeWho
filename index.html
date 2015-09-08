@@ -23,34 +23,31 @@
 
 <p id="introText"> This game is based on the guessing game from the show, except I chose to show the actual Pokémon instead of just the silhouette! Choose which generations you want to play from at the right (the default is all generations). Pokémon is © Nintentdo. Images are obtained from <a href="http://archives.bulbagarden.net/w/index.php?title=Category:Ken_Sugimori_Pok%C3%A9mon_artwork&fileuntil=*092%0A092Gastly+RG.png#mw-category-media" style="color: yellow">Bulbapedia</a> and were drawn by Ken Sugimori. I use a database obtained from <a href="https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/pokemon_species.csv" style="color: yellow">Veekun's Github</a> (thanks!).</p>
 
-<!---------- PAGE LEFT --------->
+<!-- PAGE LEFT -->
 <div id="leftSide">
 
 <!-- Main Image Box -->
 <div id="imageBox" class="pokeBox">
 <img id="myImg" src="http://cdn.bulbagarden.net/upload/0/0d/025Pikachu.png"/>
-<!-- src="http://t2.gstatic.com/images?q=tbn:ANd9GcReehil_3oUTa3YqXmfDcOYmjvIT_DYpw3oUmSnmj3gqAGx__eh"/> -->
 
 <p id="rightOrNot">
 <span id="amIRight">Play!</span>
 <br>
 <span id="whoIsIt">Press New Game</span>
-<!--<p id="amIRight">Correct!</p>
-<p id="whoIsIt">It's a Pokemon!</p>-->
 </p>
 
 </div>
 
 </div>
-<!---------- END OF PAGE LEFT --------->
+<!-- END OF PAGE LEFT -->
 
 
 
-<!---------- PAGE RIGHT --------->
+<!-- PAGE RIGHT -->
 <div id="rightSide">
 
 
-<!---------- SCORE BOX --------->
+<!-- SCORE BOX -->
 <div id="scoreBox">
 
 <!-- Current Score -->
@@ -67,11 +64,11 @@
 </div>
 
 </div>
-<!------- END OF SCORE BOX ------->
+<!-- END OF SCORE BOX -->
 
 
 
-<!------- GENERATION PICKER ------->
+<!-- GENERATION PICKER -->
 <div id="genPicker" class="pokeBox">
 <p class="pokeBoxTitle">Choose Your Generations:</p>
 
@@ -88,36 +85,36 @@
 </div>
 
 </div>
-<!--- END OF GENERATION PICKER ---->
+<!-- END OF GENERATION PICKER -->
 
 
 
-<!------- GUESS INPUT BOX --------->
+<!-- GUESS INPUT BOX -->
 <div id="guessBox" class="pokeBox">
 <p class="pokeBoxTitle">Who is it?<p>
 <input id="guess" type="text">
 <button id="submitGuess">Take a Guess</button>
 <button id="newGame">New Game</button>
 </div>
-<!--- -END OF GUESS INPUT BOX ------>
+<!-- END OF GUESS INPUT BOX -->
 
 
 
 
-<!----------- STATUS BOX ------------>
+<!-- STATUS BOX -->
 <div id="statusBox" class="pokeBox">
 <p class="pokeBoxTitle">Guesses Left:</p>
 <p id="guessesLeft"></p>
 </div>
-<!-------- END OF STATUS BOX --------->
+<!-- END OF STATUS BOX -->
 
 
 </div>
-<!---------- END OF PAGE RIGHT --------->
+<!-- END OF PAGE RIGHT -->
 
 
 </div>
-<!------- END OF MAIN CONTENT --------->
+<!-- END OF MAIN CONTENT -->
 
 
 <script>
@@ -125,17 +122,17 @@
 
 /********************************************************/
 /********************************************************/
-/**********************   VARIABLES   *******************/
+/****************   GLOBAL  VARIABLES   *****************/
 /********************************************************/
 /********************************************************/
 
-var pkmnName;					// This is the actual name: Bulbasaur
+var pkmnName;				// This is the actual name: Bulbasaur
 var pkmnID;					// The pokemon's ID.
-var pkmnFileName;				// Bulbasaur001.png
+var pkmnFileName;			// Bulbasaur001.png
 var myURL;					// This is the URL the image ajax request
-var csvArray;					// This is the csv pokemon database file
-var guessesLeft = 3;				// Guesses
-var score = 0;					// The current score
+var csvArray;				// This is the csv pokemon database file
+var guessesLeft = 3;		// Guesses
+var score = 0;				// The current score
 var generationArray = [1, 2, 3, 4, 5, 6];	// This stores which generations have been selected
 var numOfGens = 6;				// The number of generations selected.
 var myHigh = localStorage.getItem("highScore");	// The high score
@@ -149,6 +146,9 @@ var myHigh = localStorage.getItem("highScore");	// The high score
 /********************************************************/
 /********************************************************/
 
+// These pokemon have names from the csv that are not intuitive
+// for a player to type in.
+
 var troublesomeIndex;
 
 var troublesomeIds = [29, 32, 83, 122, 233, 250, 439, 474, 487, 492, 585, 586, 669];
@@ -160,7 +160,6 @@ var troublesomeNames = ["Nidoran", "Nidoran",
 	"Deerling-Spring", "Sawsbuck-Spring", "Flabébé" ];
 
 
-// Note: you should probably make some of these names variable
 var troublesomeGuessMatch = ["Nidoran", "Nidoran", 
 	"Farfetch'd", "Mr. Mime", "porygon2", 
 	"Ho-Oh", "Mime Jr.", "Porygon-Z", 
@@ -176,7 +175,7 @@ var troublesomeGuessMatch = ["Nidoran", "Nidoran",
 /********************************************************/
 /********************************************************/
 
-
+// This function sets up the high score display
 function setupHighScore() {
 
 	if (myHigh === null) {
@@ -187,6 +186,8 @@ function setupHighScore() {
 	$("#highScoreDisp").html(myHigh);
 }
 
+// If a user beats his/her high schore, this function
+// changes it dynamically as the game progresses
 function changeHighScore() {
 
 	if (score > myHigh) {
@@ -197,115 +198,54 @@ function changeHighScore() {
 	$("#highScoreDisp").html(myHigh);
 }
 
-
+// This function gets a random value in a range
 function randomVal(minRange, maxRange) {
 	return (Math.floor((Math.random() * (maxRange - minRange + 1)) + minRange));
 }
 
+// This function is responsible for getting a random pokemon id
+// within the generations chosen by the user
 function getRandomId() {
-
 	if (generationArray.length != 0) {
-
-	var whichGen = generationArray[(randomVal(0, (generationArray.length - 1)))];
-	console.log(whichGen);
-	if (whichGen === 1) {
-		return randomVal(1, 151);
-	} else if (whichGen === 2) {
-		return randomVal(152, 251);
-	} else if (whichGen === 3) {
-		return randomVal(252, 386);
-	} else if (whichGen === 4) {
-		return randomVal(387, 493);
-	} else if (whichGen === 5) {
-		return randomVal(494, 649);
-	} else if (whichGen === 6) {
-		return randomVal(650, 719);
-	}
+		var whichGen = generationArray[(randomVal(0, (generationArray.length - 1)))];
+		if (whichGen === 1) {
+			return randomVal(1, 151);
+		} else if (whichGen === 2) {
+			return randomVal(152, 251);
+		} else if (whichGen === 3) {
+			return randomVal(252, 386);
+		} else if (whichGen === 4) {
+			return randomVal(387, 493);
+		} else if (whichGen === 5) {
+			return randomVal(494, 649);
+		} else if (whichGen === 6) {
+			return randomVal(650, 719);
+		}
 	} else {
 		return pkmnID;
 	}
 }
 
-
-function jsonSuccess(jsonFile) {
-	var dataStr = jsonFile.query.pages["-1"].imageinfo[0].url;
-	$("#myImg").attr("src", dataStr);
-	$("#myImg").on("load", function() {
-				buttonSwitch(false);
-			});
-};
-
-function jsonCall() {
-
-	pkmnID = getRandomId();	
-
-	troublesomeIndex = $.inArray(pkmnID, troublesomeIds);
-
-	if (troublesomeIndex > -1) {
-		pkmnName = troublesomeNames[troublesomeIndex];
-	} else {
-		// This code goes through the csv array and gets
-		// the pokemon's name, capitalizing it
-		pkmnName = csvArray[pkmnID][1];
-		pkmnName = pkmnName.substring(0,1).toUpperCase() + pkmnName.substring(1);
-	}
-
-
-	// myPkmnID is used to get the dex number of the pokemon
-	// to be used to get the png image from bulbapedia
-	var myPkmnIDStr = csvArray[pkmnID][0];	
-	while (myPkmnIDStr.length < 3) {
-		myPkmnIDStr = "0" + myPkmnIDStr;
-	}
-
-
-	pkmnFileName = myPkmnIDStr + pkmnName + ".png";
-
-	myURL = "http://bulbapedia.bulbagarden.net/w/api.php?action=query&format=json&titles=File:"+ pkmnFileName +"&prop=imageinfo&iiprop=url";
-	
-
-	$.ajax({
-		dataType: "jsonp",
-		url: myURL,
-		statusCode: {
-			404: function () { alert("page not found"); }
-		},
-		success: jsonSuccess,
-	});
-}
-
-function csvCall() {
-	$.ajax({
-		url: "pokemon_species.csv",
-		dataType: "text",
-		success: csvSuccess,
-	});
-}
-
-function csvSuccess(csvFile) {
-	csvArray = $.csv.toArrays(csvFile);
-	// console.log("Made a successful CSV call...");
-}
-
-
-
+// This function changes the internal available generations based on
+// which generations a user has checked
 function changeGenArray(genNum) {
 	if (!($("#gen" + genNum).prop("checked"))) {
 		generationArray = $.grep(generationArray, function(value) {
 						return (value != genNum);
 					});
-		console.log("You removed " + genNum + " from it...");
 		numOfGens -= 1;
 	} else {
 		generationArray.push(genNum);
 		console.log("You pushed " + genNum + " to it...");
 		numOfGens += 1;
 	}
-}	 
+}	
 
+// This function binds the changeGenArray function to each of
+// the generation checkboxes on the UI. It also sets all of the
+// checkboxes to checked by default.
 function checkCheckboxes() {
-	for (var j = 1; j < 7; j++) {	
-		//console.log("Got to " + j);
+	for (var j = 1; j < 7; j++) {
 		$("#gen" + j).prop("checked", true);
 	}
 
@@ -329,28 +269,77 @@ function checkCheckboxes() {
 	});
 }
 
-
+// This function disables or enables the buttons for 
+// the game under certain conditions.
 function buttonSwitch(aBoolean) {
 	for (var j = 1; j < 7; j++) {
-		// console.log("Disabled " + j);
 		$("#gen" + j).prop("disabled", aBoolean); 
 	}
 
 	$("#submitGuess").prop("disabled", aBoolean);
 	$("#newGame").prop("disabled", aBoolean);
-} 
+}
 
+// This function is used to set up the image of a pokemon to guess
+function jsonSuccess(jsonFile) {
+	var dataStr = jsonFile.query.pages["-1"].imageinfo[0].url;
+	$("#myImg").attr("src", dataStr);
+	$("#myImg").on("load", function() {
+				buttonSwitch(false);
+			});
+};
 
-/*
-function atLeastOneGen() {
-	var atLeastOneGen = false;
-	for (var k = 1; k < 7; k++) {
-		var genChecked = ("#gen" + k).prop("disabled");
-		atLeastOneGen = atLeastOneGen || (!genChecked);
+// This function is called to get a new pokemon to guess and
+// change all of the internal program info to accommodate
+function jsonCall() {
+
+	pkmnID = getRandomId();	
+	troublesomeIndex = $.inArray(pkmnID, troublesomeIds);
+
+	if (troublesomeIndex > -1) {
+		pkmnName = troublesomeNames[troublesomeIndex];
+	} else {
+		// This code goes through the csv array and gets
+		// the pokemon's name, capitalizing it
+		pkmnName = csvArray[pkmnID][1];
+		pkmnName = pkmnName.substring(0,1).toUpperCase() + pkmnName.substring(1);
 	}
 
-	return atLeastOneGen;
-} */
+
+	// myPkmnID is used to get the dex number of the pokemon
+	// to be used to get the png image from bulbapedia
+	var myPkmnIDStr = csvArray[pkmnID][0];	
+	while (myPkmnIDStr.length < 3) {
+		myPkmnIDStr = "0" + myPkmnIDStr;
+	}
+
+	pkmnFileName = myPkmnIDStr + pkmnName + ".png";
+	myURL = "http://bulbapedia.bulbagarden.net/w/api.php?action=query&format=json&titles=File:"+ pkmnFileName +"&prop=imageinfo&iiprop=url";
+	
+	// The ajax call to bulbapedia for the image of the pokemon
+	$.ajax({
+		dataType: "jsonp",
+		url: myURL,
+		statusCode: {
+			404: function () { alert("page not found"); }
+		},
+		success: jsonSuccess,
+	});
+}
+
+// These two functions are used to set up the csv array
+// of pokemon information from a file.
+function csvCall() {
+	$.ajax({
+		url: "pokemon_species.csv",
+		dataType: "text",
+		success: csvSuccess,
+	});
+}
+function csvSuccess(csvFile) {
+	csvArray = $.csv.toArrays(csvFile);
+} 
+
 	
 
 /********************************************************/
@@ -359,15 +348,17 @@ function atLeastOneGen() {
 /********************************************************/
 /********************************************************/
 
+// This function takes care of telling the user via a
+// div whether or not they made a correct guess
 function showCorrectOrNot(amIRight, whoIsIt, resetAlso) {
 	$("#myImg").fadeTo(200, 0.50, function() {
 		$("#amIRight").html(amIRight);
-		$("#whoIsIt").html(whoIsIt);
-		$("#rightOrNot").show(200); //, function() { console.log("Showed div..."); });
+		$("#whoIsIt").html(whoIsIt); // The Pokemon Name or "Try again!"
+		$("#rightOrNot").show(200);
 
 		setTimeout( function() {
 
-			$("#rightOrNot").hide(300); //, function() {console.log("Hid div..."); });
+			$("#rightOrNot").hide(300);
 
 			$("#myImg").fadeTo(200, 1, function() {
 				console.log("Animation...");
@@ -382,7 +373,9 @@ function showCorrectOrNot(amIRight, whoIsIt, resetAlso) {
 	});
 };
 
-function correctGuessSequence(answer, currStatus) {
+// This function is called when a user submits a guess, and takes
+// care of displaying the appropriate messages to the user.
+function guessSequence(answer, currStatus) {
 	answer = answer.toLowerCase();
 	answer = answer.substring(0,1).toUpperCase() + answer.substring(1);
 	
@@ -406,34 +399,35 @@ function correctGuessSequence(answer, currStatus) {
 	$("#guessesLeft").html(guessesLeft);
 }
 
-
-$("#currScoreDisp").html(score);
-$("#guessesLeft").html(guessesLeft);
-
+// This button contains much of the game's functionality.
 $("#submitGuess").click(function() {
-
 	if (numOfGens > 0) {
 	
 		buttonSwitch(true);
-		console.log("Submit ran...");
 		var myGuess = $("#guess").val();
 		var guessCheck;
 
+		// Check to see if the pokemon is in the troublsome array
+		// or if the guess only containes valid character
 		if ((troublesomeIndex > -1) || (/^[a-zA-Z]+$/.test(myGuess))) {
 
+			// If the pokemon is in the troublesome array, we need to 
+			// check it against the intuitive spelling in our internal
+			// array. If not, we can use the pkmnName to check against.
 			if (troublesomeIndex > -1) {
 				guessCheck = troublesomeGuessMatch[troublesomeIndex];
 			} else {
 				guessCheck = pkmnName;
 			}
-	
+
+			// See if the user was correct, and call guessSequence.
 			if (myGuess.toLowerCase() === guessCheck.toLowerCase()) {
-				correctGuessSequence(guessCheck, "Correct");
+				guessSequence(guessCheck, "Correct");
 			} else {
 				if (guessesLeft == 1) {
-					correctGuessSequence(guessCheck, "GameOver");
+					guessSequence(guessCheck, "GameOver");
 				} else {
-					correctGuessSequence(guessCheck, "Incorrect");
+					guessSequence(guessCheck, "Incorrect");
 				}
 			}
  
@@ -446,6 +440,15 @@ $("#submitGuess").click(function() {
 		console.log("Need to choose at least one generation..."); 
 	}
 });
+
+
+/********************************************************/
+/********************************************************/
+/**************   INITIAL/NEW GAME SETUP   **************/
+/********************************************************/
+/********************************************************/
+$("#currScoreDisp").html(score);
+$("#guessesLeft").html(guessesLeft);
 
 $(document).ready(function() {
 	csvCall();
@@ -464,11 +467,6 @@ $("#newGame").click(function() {
 	$("#guess").val("");
 	jsonCall();
 });
-
-
-
-
-
 		
 </script>
 
