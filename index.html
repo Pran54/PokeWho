@@ -293,6 +293,8 @@ function jsonSuccess(jsonFile) {
 // change all of the internal program info to accommodate
 function jsonCall() {
 
+	if (numOfGens <= 0) { return; }
+
 	pkmnID = getRandomId();	
 	troublesomeIndex = $.inArray(pkmnID, troublesomeIds);
 
