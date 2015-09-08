@@ -293,8 +293,6 @@ function jsonSuccess(jsonFile) {
 // change all of the internal program info to accommodate
 function jsonCall() {
 
-	if (numOfGens <= 0) { return; }
-
 	pkmnID = getRandomId();	
 	troublesomeIndex = $.inArray(pkmnID, troublesomeIds);
 
@@ -462,12 +460,14 @@ $(document).ready(function() {
 });
 
 $("#newGame").click(function() {
-	$("#rightOrNot").hide(200);
-	buttonSwitch(true);
-	score = 0; 
-	$("#currScoreDisp").html(score); 
-	$("#guess").val("");
-	jsonCall();
+	if (numOfGens > 0) {
+		$("#rightOrNot").hide(200);
+		buttonSwitch(true);
+		score = 0; 
+		$("#currScoreDisp").html(score); 
+		$("#guess").val("");
+		jsonCall();
+	}
 });
 		
 </script>
